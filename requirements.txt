@@ -1,0 +1,6 @@
+h5py
+numpy
+pandas
+pyyaml
+rdkit
+torch>=2.7

@@ -1,0 +1,30 @@
+cff-version: 1.2.0
+message: "Please cite the original MIST paper when using this implementation."
+title: "MIST: Metabolite Inference with Spectrum Transformers"
+type: software
+repository-code: "https://github.com/coleygroup/MIST"
+license: MIT
+authors:
+  - name: "MIST contributors"
+preferred-citation:
+  type: article
+  title: "Annotating metabolite mass spectra with domain-inspired chemical formula transformers"
+  authors:
+    - family-names: Goldman
+      given-names: Samuel
+    - family-names: Wohlwend
+      given-names: Jeremy
+    - family-names: Stražar
+      given-names: Martin
+    - family-names: Haroush
+      given-names: Guy
+    - family-names: Xavier
+      given-names: Ramnik J.
+    - family-names: Coley
+      given-names: Connor W.
+  journal: Nature Machine Intelligence
+  volume: 5
+  start: 965
+  end: 979
+  year: 2023
+  doi: "10.1038/s42256-023-00708-3"

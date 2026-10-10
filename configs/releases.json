@@ -1,0 +1,26 @@
+{
+  "msg-noaug": {
+    "config": "configs/noaug/msg.yaml",
+    "checkpoint": "checkpoints/mist_msg_noaug.ckpt",
+    "world_size": 1,
+    "synthetic_molecules": 0
+  },
+  "msg-aug": {
+    "config": "configs/aug/msg.yaml",
+    "checkpoint": "checkpoints/mist_msg_aug.ckpt",
+    "world_size": 4,
+    "synthetic_molecules": 4000000
+  },
+  "canopus-noaug": {
+    "config": "configs/noaug/canopus.yaml",
+    "checkpoint": "checkpoints/mist_canopus_noaug.ckpt",
+    "world_size": 1,
+    "synthetic_molecules": 0
+  },
+  "canopus-aug": {
+    "config": "configs/aug/canopus.yaml",
+    "checkpoint": "checkpoints/mist_canopus_aug.ckpt",
+    "world_size": 4,
+    "synthetic_molecules": 2000000
+  }
+}

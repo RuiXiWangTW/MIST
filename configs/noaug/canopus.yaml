@@ -1,0 +1,61 @@
+seed: 20260920
+model:
+  hidden_size: 1024
+  peak_attn_layers: 4
+  num_heads: 16
+  refine_layers: 4
+  spectra_dropout: 0.1
+  pairwise_featurization: true
+  no_diffs: true
+  form_embedder: pos-cos
+  output_size: 4096
+loss:
+  cosine_weight: 1.0
+  tanimoto_weight: 0.1
+  iterative_weight: 0.4
+augmentation:
+  spectrum_probability: 0.5
+  peak_drop_probability: 0.1
+  intensity_jitter_std: 0.2
+optimizer:
+  name: adamw
+  learning_rate: 0.000375
+  weight_decay: 1.0e-06
+  warmup_steps: 250
+  fused: true
+experiment:
+  name: canopus_noaug
+  dataset: canopus_all
+  parameter_count: 72296996
+  from_scratch: true
+  model_selection_split: val
+  release_filename: mist_canopus_noaug.ckpt
+data:
+  dataset_name: canopus_all
+  training_sources:
+  - name: real_train
+    source_type: real
+    cache: data/compact/canopus/train
+    batch_size: 115
+    seed_offset: 17
+  validation_source:
+    cache: data/compact/canopus/val
+    batch_size: 256
+  num_workers: 4
+  prefetch_factor: 2
+train:
+  max_steps: 30000
+  lr_schedule_total_steps: 120000
+  gradient_accumulation: 4
+  gradient_clip_norm: 5.0
+  precision: bf16
+  ema_decay: 0.999
+  validate_every: 3000
+  checkpoint_every: 3000
+  log_every: 50
+  output_dir: runs/noaug/canopus
+  compile: false
+  retain_validation_checkpoints: false
+  retain_endpoint_checkpoint: true
+  expected_parameter_count: 72296996
+  expected_world_size: 1

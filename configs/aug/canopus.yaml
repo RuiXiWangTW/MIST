@@ -1,0 +1,67 @@
+seed: 20260909
+experiment:
+  name: canopus_aug
+  dataset: canopus_all
+  parameter_count: 72296996
+  from_scratch: true
+  model_selection_split: val
+  release_filename: mist_canopus_aug.ckpt
+data:
+  dataset_name: canopus_all
+  num_workers: 4
+  prefetch_factor: 2
+  training_sources:
+  - name: random_pubchem_2m_glacier20
+    source_type: simulated
+    cache: data/compact/canopus/synthetic
+    batch_size: 2048
+    seed_offset: 0
+    combine_part_tails: true
+  - name: canopus_train
+    source_type: real
+    cache: data/compact/canopus/train
+    batch_size: 225
+    seed_offset: 17
+  validation_source:
+    cache: data/compact/canopus/val
+    batch_size: 64
+model:
+  hidden_size: 1024
+  peak_attn_layers: 4
+  num_heads: 16
+  refine_layers: 4
+  spectra_dropout: 0.1
+  pairwise_featurization: true
+  no_diffs: true
+  form_embedder: pos-cos
+  output_size: 4096
+loss:
+  cosine_weight: 1.0
+  tanimoto_weight: 0.1
+  iterative_weight: 0.4
+augmentation:
+  spectrum_probability: 0.5
+  peak_drop_probability: 0.1
+  intensity_jitter_std: 0.2
+optimizer:
+  name: adamw
+  learning_rate: 0.0002
+  weight_decay: 1.0e-06
+  warmup_steps: 4883
+  fused: true
+train:
+  output_dir: runs/aug/canopus
+  max_steps: 244150
+  lr_schedule_total_steps: 244150
+  gradient_accumulation: 1
+  gradient_clip_norm: 5.0
+  precision: bf16
+  ema_decay: 0.999
+  validate_every: 4883
+  checkpoint_every: 4883
+  log_every: 100
+  compile: false
+  save_best: true
+  retain_validation_checkpoints: false
+  expected_parameter_count: 72296996
+  expected_world_size: 4

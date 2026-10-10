@@ -1,0 +1,65 @@
+seed: 20260810
+experiment:
+  name: msg_aug
+  dataset: msg_all
+  parameter_count: 72296996
+  from_scratch: true
+  model_selection_split: val
+  release_filename: mist_msg_aug.ckpt
+data:
+  dataset_name: msg_all
+  training_sources:
+  - name: refined4m_glacier_msg
+    source_type: simulated
+    cache: data/compact/msg/synthetic
+    batch_size: 2048
+    seed_offset: 0
+    combine_part_tails: true
+  - name: msg_train
+    source_type: real
+    cache: data/compact/msg/train
+    batch_size: 75
+    seed_offset: 17
+  validation_source:
+    cache: data/compact/msg/val
+    batch_size: 512
+  num_workers: 4
+  prefetch_factor: 2
+model:
+  hidden_size: 1024
+  peak_attn_layers: 4
+  num_heads: 16
+  refine_layers: 4
+  spectra_dropout: 0.1
+  pairwise_featurization: true
+  no_diffs: true
+  form_embedder: pos-cos
+  output_size: 4096
+loss:
+  cosine_weight: 1.0
+  tanimoto_weight: 0.1
+  iterative_weight: 0.4
+augmentation:
+  spectrum_probability: 0.5
+  peak_drop_probability: 0.1
+  intensity_jitter_std: 0.2
+optimizer:
+  name: adam
+  learning_rate: 0.0002
+  weight_decay: 1.0e-06
+  warmup_steps: 9577
+train:
+  output_dir: runs/aug/msg
+  max_steps: 478850
+  lr_schedule_total_steps: 478850
+  gradient_accumulation: 1
+  gradient_clip_norm: 5.0
+  precision: bf16
+  ema_decay: 0.9974968671630001
+  validate_every: 9577
+  checkpoint_every: 9577
+  log_every: 100
+  compile: false
+  save_best: true
+  expected_parameter_count: 72296996
+  expected_world_size: 4

@@ -1,0 +1,65 @@
+[build-system]
+requires = ["setuptools>=64.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mist"
+version = "1.0.0"
+description = "MIST fingerprint prediction with native distributed training and optional synthetic spectra"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE.md" }
+keywords = ["mass-spectrometry", "metabolomics", "transformers"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: Scientific/Engineering :: Chemistry",
+]
+
+dependencies = [
+  "h5py",
+  "numpy",
+  "pandas",
+  "pyyaml",
+  "rdkit",
+  "torch>=2.7",
+]
+
+[project.urls]
+Repository = "https://github.com/coleygroup/MIST"
+Upstream = "https://github.com/samgoldman97/mist"
+Publication = "https://doi.org/10.1038/s42256-023-00708-3"
+
+[project.optional-dependencies]
+test = ["pytest", "ruff"]
+
+[project.scripts]
+mist-glacier-predict = "mist.glacier.predict:main"
+mist-download = "mist.download:main"
+mist-export-cache = "mist.data.export_cache:main"
+mist-build-real-cache = "mist.data.build_all_cache:main"
+mist-build-simulated-cache = "mist.data.build_simulated_cache:main"
+mist-predict-fingerprints = "mist.data.input_signal:main"
+mist-train = "mist.train_scaled:main"
+mist-evaluate = "mist.evaluate_scaled:main"
+
+[tool.setuptools]
+license-files = ["LICENSE.md", "NOTICE.md", "LICENSES/*.txt"]
+include-package-data = true
+
+[tool.setuptools.package-dir]
+"" = "src"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.setuptools.package-data]
+mist = ["artifacts.json"]

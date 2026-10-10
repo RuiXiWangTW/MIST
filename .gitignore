@@ -1,0 +1,35 @@
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.venv/
+build/
+dist/
+
+# Local datasets, checkpoints, and run products.
+data/*
+external/
+cache/
+checkpoints/
+runs/
+results/
+logs/
+experiments/
+slurm-*.out
+*.partial
+
+# Local compiled kernels and smoke-test workspaces.
+.runtime/
+.smoke-*/
+
+# Editors and operating systems.
+.DS_Store
+*.swp
+.idea/
+.vscode/
+
+downloads/
+staging/

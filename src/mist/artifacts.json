@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "artifacts": {
+    "msg-source": {
+      "description": "MassSpecGym processed spectra, formula assignments, labels and splits",
+      "filename": "msg_all.tar.gz",
+      "url": null,
+      "sha256": null,
+      "zenodo_doi": null
+    },
+    "msg-compact": {
+      "description": "MassSpecGym portable training, validation and test feature caches",
+      "filename": "msg_compact.tar.gz",
+      "url": null,
+      "sha256": null,
+      "zenodo_doi": null
+    },
+    "msg-synthetic": {
+      "description": "MassSpecGym GLACIER synthetic training features (refined 4M molecules)",
+      "filename": "msg_synthetic.tar.gz",
+      "url": null,
+      "sha256": null,
+      "zenodo_doi": null
+    },
+    "msg-noaug": {
+      "description": "MIST MassSpecGym real-only EMA checkpoint",
+      "filename": "mist_msg_noaug.ckpt",
+      "url": null,
+      "sha256": null,
+      "zenodo_doi": null
+    },
+    "msg-aug": {
+      "description": "MIST MassSpecGym synthetic-augmented EMA checkpoint",
+      "filename": "mist_msg_aug.ckpt",
+      "url": null,
+      "sha256": null,
+      "zenodo_doi": null
+    },
+    "msg-glacier": {
+      "description": "GLACIER MassSpecGym checkpoint",
+      "filename": "glacier_msg.ckpt",
+      "url": null,
+      "sha256": null,
+      "zenodo_doi": null
+    },
+    "canopus-source": {
+      "description": "CANOPUS processed spectra, formula assignments, labels and splits",
+      "filename": "canopus_all.tar.gz",
+      "url": null,
+      "sha256": null,
+      "zenodo_doi": null
+    },
+    "canopus-compact": {
+      "description": "CANOPUS portable training, validation and test feature caches",
+      "filename": "canopus_compact.tar.gz",
+      "url": null,
+      "sha256": null,
+      "zenodo_doi": null
+    },
+    "canopus-synthetic": {
+      "description": "CANOPUS GLACIER synthetic training features (random 2M molecules)",
+      "filename": "canopus_synthetic.tar.gz",
+      "url": null,
+      "sha256": null,
+      "zenodo_doi": null
+    },
+    "canopus-noaug": {
+      "description": "MIST CANOPUS real-only EMA checkpoint",
+      "filename": "mist_canopus_noaug.ckpt",
+      "url": null,
+      "sha256": null,
+      "zenodo_doi": null
+    },
+    "canopus-aug": {
+      "description": "MIST CANOPUS synthetic-augmented EMA checkpoint",
+      "filename": "mist_canopus_aug.ckpt",
+      "url": null,
+      "sha256": null,
+      "zenodo_doi": null
+    },
+    "canopus-glacier": {
+      "description": "GLACIER CANOPUS checkpoint",
+      "filename": "glacier_canopus.ckpt",
+      "url": null,
+      "sha256": null,
+      "zenodo_doi": null
+    }
+  }
+}
