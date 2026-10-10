@@ -11,15 +11,14 @@ the former as a deterministic canonical representation whenever it is valid.
 
 from __future__ import annotations
 
+import re
+from collections.abc import Iterable
 from dataclasses import dataclass
 from functools import lru_cache
-import re
-from typing import Iterable
 
 import numpy as np
 from rdkit import Chem, DataStructs
 from rdkit.Chem import rdFingerprintGenerator
-
 
 SCHEMA_VERSION = 1
 FORM_ELEMENTS = (

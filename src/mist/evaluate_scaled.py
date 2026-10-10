@@ -6,8 +6,8 @@ import argparse
 import hashlib
 import json
 import os
-from pathlib import Path
 import time
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -221,7 +221,7 @@ def evaluate(args: argparse.Namespace) -> None:
                 "underlying_compound_metrics": metric_summary(
                     per_compound["mean_tanimoto"].to_numpy()
                 ),
-                "n_underlying_compounds": int(len(per_compound)),
+                "n_underlying_compounds": len(per_compound),
             }
             threshold_record = {
                 "format_version": 1,
@@ -282,7 +282,7 @@ def evaluate(args: argparse.Namespace) -> None:
                 "underlying_compound_metrics": metric_summary(
                     per_compound["mean_tanimoto"].to_numpy()
                 ),
-                "n_underlying_compounds": int(len(per_compound)),
+                "n_underlying_compounds": len(per_compound),
             }
         _json_atomic(summary_path, result)
         print(json.dumps(result, indent=2, sort_keys=True), flush=True)

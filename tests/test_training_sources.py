@@ -110,9 +110,10 @@ def test_rejects_nontraining_synthetic_contract(tmp_path):
 
 
 def test_export_indexed_cache_is_portable(tmp_path, monkeypatch):
-    from mist.data.export_cache import export_cache
-    from mist.data.compact import CompactFeatureDataset
     import shutil
+
+    from mist.data.compact import CompactFeatureDataset
+    from mist.data.export_cache import export_cache
 
     source = _write_cache(tmp_path / "input", source_type="real")
     np.save(source / "part_00000/names.npy", np.array([f"s{i}" for i in range(8)]))

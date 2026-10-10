@@ -17,6 +17,8 @@ from pathlib import Path
 import h5py
 import pandas as pd
 
+logger = logging.getLogger(__name__)
+
 SUPPORTED_DATASETS: Mapping[str, Path] = {
     "msg_all": Path("splits/split.tsv"),
     "canopus_all": Path("splits/source_splits/canopus_hplus_100_0.tsv"),
@@ -274,7 +276,7 @@ def load_dataset(
             raise DatasetContractError(
                 f"{layout.name} produced no usable {split_name} collision entries"
             )
-        logging.info(
+        logger.info(
             "%s %s: %d entries (%d labels without subformula assignments)",
             layout.name,
             split_name,

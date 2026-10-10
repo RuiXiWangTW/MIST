@@ -4,17 +4,18 @@ Derived from the MIT-licensed ms-pred implementation. See NOTICE.md.
 """
 
 import math
+
 import numpy as np
 import torch
-from torch import nn
 import torch.nn.functional as F
-from rdkit import Chem
-import ms_pred.common as common
-import ms_pred.magma.fragmentation as fragmentation
-import ms_pred.nn_utils as nn_utils
+from ms_pred import common, nn_utils
 from ms_pred.graphormer.graphormer_graph_encoder import GraphormerGraphEncoder
+from ms_pred.magma import fragmentation
+from rdkit import Chem
+from torch import nn
+
+from .decoder import CrossAttnDecoder, DiagonalIntenDecoder, MembershipIntenDecoder
 from .features import TreeProcessor
-from .decoder import MembershipIntenDecoder, CrossAttnDecoder, DiagonalIntenDecoder
 
 
 class CheckpointGLACIER(nn.Module):
@@ -102,7 +103,7 @@ class CheckpointGLACIER(nn.Module):
             onehot_types = torch.eye(adduct_types)
             if self.embed_elem_group:
                 adduct_modes = len(
-                    set([j for i in common.ion_pos2extra_multihot.values() for j in i])
+                    {j for i in common.ion_pos2extra_multihot.values() for j in i}
                 )
                 multihot_modes = torch.zeros((adduct_types, adduct_modes))
                 for i in range(adduct_types):
@@ -483,11 +484,7 @@ class CheckpointGLACIER(nn.Module):
                 (*memory_mask.shape[:-1], 1), dtype=memory_mask.dtype, device=device
             )
             memory_mask = torch.cat([root_col, memory_mask], dim=-1)
-            if self.inten_self_attn_mode == "none":
-                hidden = self.inten_decoder(
-                    tgt=root_token_embedded, memory=memory, memory_mask=memory_mask
-                )
-            elif self.inten_self_attn_mode == "diagonal":
+            if self.inten_self_attn_mode == "none" or self.inten_self_attn_mode == "diagonal":
                 hidden = self.inten_decoder(
                     tgt=root_token_embedded, memory=memory, memory_mask=memory_mask
                 )
@@ -618,7 +615,7 @@ class CheckpointGLACIER(nn.Module):
         patterns = torch.zeros_like(flat_preds, dtype=torch.bool)
         max_flat_k = flat_k.max().item()
         if max_flat_k > 0:
-            topk_vals, topk_idx = torch.topk(flat_preds, k=max_flat_k, dim=-1)
+            _topk_vals, topk_idx = torch.topk(flat_preds, k=max_flat_k, dim=-1)
             arange_k = torch.arange(
                 max_flat_k, device=breakpoint_preds.device
             ).unsqueeze(0)
@@ -766,8 +763,8 @@ class CheckpointGLACIER(nn.Module):
             dtype=torch.long,
             device=device,
         )
-        max_nodes_gf = max((gf["x"].shape[0] for gf in graphormer_inputs))
-        max_dist = max((gf["edge_input"].shape[2] for gf in graphormer_inputs))
+        max_nodes_gf = max(gf["x"].shape[0] for gf in graphormer_inputs)
+        max_dist = max(gf["edge_input"].shape[2] for gf in graphormer_inputs)
         node_feat_dim = graphormer_inputs[0]["x"].shape[1]
         edge_feat_dim = graphormer_inputs[0]["attn_edge_type"].shape[2]
         x_batch = torch.zeros(

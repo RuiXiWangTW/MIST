@@ -39,7 +39,9 @@ def test_finalization_requires_all_parts_and_publishes_relative_paths(tmp_path):
 
 def test_simulation_to_trainable_features(tmp_path):
     from argparse import Namespace
+
     import h5py
+
     from mist.data.atlas import morgan4096_packed
     from mist.data.build_simulated_cache import run_worker
     from mist.data.training_sources import _validate_feature_layout

@@ -1,13 +1,13 @@
-from argparse import Namespace
 import json
+from argparse import Namespace
 
 import numpy as np
 import torch
+from test_training_sources import _write_cache
 
 from mist.data.input_signal import predict_input_signal
 from mist.evaluate_scaled import evaluate
 from mist.models.scaled_mist import ScaledMIST
-from test_training_sources import _write_cache
 
 
 def test_validation_calibration_and_spectrum_only_prediction(tmp_path):

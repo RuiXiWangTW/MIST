@@ -35,7 +35,7 @@ Upstream = "https://github.com/samgoldman97/mist"
 Publication = "https://doi.org/10.1038/s42256-023-00708-3"
 
 [project.optional-dependencies]
-test = ["pytest", "ruff"]
+test = ["pytest", "ruff>=0.17"]
 
 [project.scripts]
 mist-glacier-predict = "mist.glacier.predict:main"

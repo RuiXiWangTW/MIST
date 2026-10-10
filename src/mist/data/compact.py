@@ -2,19 +2,18 @@
 
 from __future__ import annotations
 
-from bisect import bisect_right
 import json
-from itertools import islice
 import math
+from bisect import bisect_right
+from collections.abc import Iterator, Sequence
+from itertools import islice
 from pathlib import Path
-from typing import Iterator, Sequence
 
 import numpy as np
 import torch
 from torch.utils.data import DataLoader, Dataset, Sampler
 
 from mist.data.atlas import unpack_fingerprints
-
 
 COMPACT_SCHEMA_VERSION = 1
 REQUIRED_ARRAYS = (

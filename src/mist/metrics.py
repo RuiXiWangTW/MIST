@@ -117,7 +117,7 @@ def metric_summary(scores: np.ndarray) -> dict[str, float | int]:
     sem = std / math.sqrt(len(values))
     mean = float(values.mean())
     return {
-        "n_spectra": int(len(values)),
+        "n_spectra": len(values),
         "mean_tanimoto": mean,
         "median_tanimoto": float(np.median(values)),
         "std_tanimoto": std,

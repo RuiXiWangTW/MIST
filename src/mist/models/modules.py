@@ -1,10 +1,11 @@
 """ modules.py"""
 import copy
-import torch
+
 import numpy as np
+import torch
 from torch import nn
 
-from mist.models import transformer_layer, form_embedders
+from mist.models import form_embedders, transformer_layer
 from mist.utils.chem_utils import ION_LST, max_instr_idx
 
 EPS = 1e-9

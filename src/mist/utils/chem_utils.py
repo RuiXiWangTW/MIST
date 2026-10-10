@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
-from collections import defaultdict
 import re
+from collections import defaultdict
 
 import numpy as np
 from rdkit import Chem
-
 
 ELECTRON_MASS = 0.00054858
 CHEM_FORMULA_PATTERN = re.compile(r"([A-Z][a-z]*)([0-9]*)")

@@ -7,10 +7,10 @@ import hashlib
 import json
 import math
 import os
-from pathlib import Path
 import re
 import tempfile
 import time
+from pathlib import Path
 
 import h5py
 import numpy as np
@@ -18,7 +18,6 @@ import pandas as pd
 
 from mist.data.atlas import ELEMENT_TO_INDEX, MONO_MASSES
 from mist.data.simulation_utils import sha256_file, stable_json_hash, write_json_atomic
-
 
 FORMULA_PATTERN = re.compile(r"([A-Z][a-z]*)([0-9]*)")
 MAX_MIST_FORMULA_COUNT_EXCLUSIVE = 255
@@ -65,8 +64,8 @@ def _heldout_keys(labels_path: Path, split_path: Path) -> tuple[np.ndarray, dict
         "split": str(split_path.resolve()),
         "split_sha256": sha256_file(split_path),
         "excluded_splits": ["test", "val"],
-        "split_rows": int(len(selected)),
-        "unique_connectivities": int(len(keys)),
+        "split_rows": len(selected),
+        "unique_connectivities": len(keys),
     }
     return keys, validation
 
@@ -150,7 +149,7 @@ def select_rows(
     # the requested 2M while making an undersized set astronomically unlikely.
     threshold_int = min(
         (1 << 64) - 1,
-        int(math.ceil((1.10 * count / total) * (1 << 64))),
+        math.ceil((1.10 * count / total) * (1 << 64)),
     )
     threshold = np.uint64(threshold_int)
     priority_parts = []

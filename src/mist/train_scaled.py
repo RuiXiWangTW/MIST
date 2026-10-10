@@ -3,27 +3,32 @@
 from __future__ import annotations
 
 import argparse
-from contextlib import nullcontext
-from copy import deepcopy
 import hashlib
 import json
 import math
 import os
-from pathlib import Path
 import random
 import time
+from contextlib import nullcontext
+from copy import deepcopy
+from pathlib import Path
 from typing import Any
 
 import numpy as np
 import torch
 import torch.distributed as dist
-from torch.nn.parallel import DistributedDataParallel
 import yaml
+from torch.nn.parallel import DistributedDataParallel
 
+from mist.data.augmentation import augment_peak_batch
 from mist.data.compact import CompactFeatureDataset, make_compact_loader
 from mist.data.training_sources import load_training_data_contract
-from mist.data.augmentation import augment_peak_batch
-from mist.metrics import calibrate_threshold, fingerprint_loss, metric_summary, tanimoto_scores
+from mist.metrics import (
+    calibrate_threshold,
+    fingerprint_loss,
+    metric_summary,
+    tanimoto_scores,
+)
 from mist.models.scaled_mist import ScaledMIST, count_parameters
 
 

@@ -1,3 +1,4 @@
+from itertools import pairwise
 from pathlib import Path
 
 import h5py
@@ -18,7 +19,7 @@ def _decode(payload: np.ndarray, offsets: np.ndarray) -> list[bytes]:
     raw = memoryview(np.asarray(payload, dtype=np.uint8))
     return [
         bytes(raw[int(start) : int(end)])
-        for start, end in zip(offsets[:-1], offsets[1:], strict=True)
+        for start, end in pairwise(offsets)
     ]
 
 

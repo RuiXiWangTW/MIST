@@ -5,11 +5,11 @@ from __future__ import annotations
 import argparse
 import json
 import os
-from pathlib import Path
 import platform
 import shutil
 import tempfile
 import time
+from pathlib import Path
 
 import numpy as np
 from rdkit import rdBase
@@ -18,9 +18,9 @@ from mist.data.atlas import morgan4096_packed
 from mist.data.compact import COMPACT_SCHEMA_VERSION
 from mist.data.data import Spectra
 from mist.data.datasets import (
+    SPLIT_NAMES,
     SUPPORTED_DATASETS,
     DatasetLayout,
-    SPLIT_NAMES,
     load_dataset,
 )
 from mist.data.featurizers import PeakFormula

@@ -3,7 +3,11 @@ from pathlib import Path
 
 import numpy as np
 
-from mist.data.compact import CompactFeatureDataset, LocalityBatchSampler, collate_compact
+from mist.data.compact import (
+    CompactFeatureDataset,
+    LocalityBatchSampler,
+    collate_compact,
+)
 
 
 def _write_part(path: Path, rows: int) -> None:

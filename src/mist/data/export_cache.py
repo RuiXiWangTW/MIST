@@ -5,13 +5,13 @@ from __future__ import annotations
 import argparse
 import json
 import os
-from pathlib import Path
 import shutil
 import tempfile
+from pathlib import Path
 
 import numpy as np
 
-from mist.data.compact import CompactFeatureDataset, REQUIRED_ARRAYS
+from mist.data.compact import REQUIRED_ARRAYS, CompactFeatureDataset
 from mist.data.simulation_utils import sha256_file, write_json_atomic
 
 

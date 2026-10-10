@@ -1,10 +1,13 @@
 """Shared manifest and molecule utilities for synthetic spectrum caches."""
 from __future__ import annotations
+
 import hashlib
 import json
 import os
 from pathlib import Path
+
 from rdkit import Chem
+
 
 class SimulationPlanError(ValueError):
     """Invalid synthetic simulation plan."""

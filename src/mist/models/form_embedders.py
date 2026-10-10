@@ -1,6 +1,6 @@
-import torch
-import torch.nn as nn
 import numpy as np
+import torch
+from torch import nn
 
 from mist.utils.chem_utils import NORM_VEC
 
@@ -264,7 +264,7 @@ class LearnedFeaturizer(IntFeaturizer):
         self.nn_embedder = nn.Embedding(
             self.MAX_COUNT_INT + self.NUM_EXTRA_EMBEDDINGS, feature_dim
         )
-        self.int_to_feat_matrix = list(self.nn_embedder.parameters())[0]
+        self.int_to_feat_matrix = next(iter(self.nn_embedder.parameters()))
 
     def forward(self, tensor):
         """

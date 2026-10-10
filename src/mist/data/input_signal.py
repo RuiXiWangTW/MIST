@@ -3,13 +3,13 @@
 from __future__ import annotations
 
 import argparse
-from bisect import bisect_right
 import json
 import os
-from pathlib import Path
 import shutil
 import tempfile
 import time
+from bisect import bisect_right
+from pathlib import Path
 
 import numpy as np
 import torch
@@ -18,7 +18,6 @@ from torch.utils.data import DataLoader, Dataset
 from mist.data.compact import COMPACT_SCHEMA_VERSION
 from mist.data.simulation_utils import sha256_file, write_json_atomic
 from mist.models.scaled_mist import ScaledMIST, count_parameters
-
 
 SPECTRUM_ARRAYS = (
     "form_vec.npy",

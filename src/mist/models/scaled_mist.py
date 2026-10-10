@@ -7,7 +7,7 @@ from typing import Any
 import torch
 from torch import nn
 
-from mist.models.modules import FPGrowingModule, FormulaTransformer
+from mist.models.modules import FormulaTransformer, FPGrowingModule
 
 
 class ScaledMIST(nn.Module):

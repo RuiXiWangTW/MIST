@@ -7,15 +7,15 @@ unconditioned, and validation always uses held-out real spectra.
 
 from __future__ import annotations
 
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import Any
 
 import numpy as np
 
 from mist.data.compact import CompactFeatureDataset
 from mist.data.datasets import SUPPORTED_DATASETS
-
 
 SOURCE_CONTRACT_SCHEMA_VERSION = 1
 SOURCE_TYPES = ("real", "simulated")

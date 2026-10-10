@@ -1,17 +1,17 @@
 """Molecular features for the released GLACIER checkpoint architecture."""
 
-from typing import Any, Dict
+from typing import Any
+
+import dgl
 import numpy as np
 import torch
 import torch.nn.functional as F
-import dgl
+from ms_pred import common, nn_utils
 from rdkit import Chem
 from rdkit.Chem import rdPartialCharges
 from rdkit.Chem.EState import EStateIndices
 from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import shortest_path
-import ms_pred.common as common
-import ms_pred.nn_utils as nn_utils
 
 
 class TreeProcessor:
@@ -84,16 +84,16 @@ class TreeProcessor:
         if not mol.GetAtomWithIdx(0).HasProp("_GasteigerCharge"):
             try:
                 rdPartialCharges.ComputeGasteigerCharges(mol)
-            except Exception:
+            except Exception:  # noqa: BLE001 - preserve the checkpoint featurizer's zero fallback
                 return q
         for i in range(n):
             a = mol.GetAtomWithIdx(i)
             if a.HasProp("_GasteigerCharge"):
                 try:
                     v = a.GetDoubleProp("_GasteigerCharge")
-                except Exception:
+                except Exception:  # noqa: BLE001 - preserve the checkpoint featurizer's zero fallback
                     v = 0.0
-                if v == v and (not np.isinf(v)):
+                if np.isfinite(v):
                     q[i] = v
         return q
 
@@ -148,7 +148,7 @@ class TreeProcessor:
         gasteiger = self._gasteiger_charges(mol)
         try:
             estate = np.asarray(EStateIndices(mol), dtype=np.float32)
-        except Exception:
+        except Exception:  # noqa: BLE001 - preserve the checkpoint featurizer's zero fallback
             estate = np.zeros(n, dtype=np.float32)
         if estate.shape[0] != n:
             estate = np.zeros(n, dtype=np.float32)
@@ -293,7 +293,7 @@ class TreeProcessor:
 
     def create_graphormer_input(
         self, mol: Any, spatial_pos_max: int = 1024, multi_hop_max_dist: int = 5
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         mol = self._to_heavy_mol(mol)
         if mol is None:
             raise ValueError("RDKit molecule is None after hydrogen removal")

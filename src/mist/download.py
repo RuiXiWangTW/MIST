@@ -4,11 +4,11 @@ from __future__ import annotations
 
 import argparse
 import hashlib
-from importlib.resources import files
 import json
 import os
-from pathlib import Path
 import tempfile
+from importlib.resources import files
+from pathlib import Path
 from urllib.parse import urlparse
 from urllib.request import urlopen
 

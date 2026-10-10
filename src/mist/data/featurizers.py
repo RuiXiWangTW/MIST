@@ -6,6 +6,7 @@ import json
 import os
 from functools import lru_cache
 from pathlib import Path
+from typing import ClassVar
 
 import h5py
 import numpy as np
@@ -143,7 +144,7 @@ def assign_subformulae(tree: dict, mass_diff_thresh: float = 20.0) -> dict:
 class PeakFormula:
     """Convert one canonical HDF5 subformula entry to MIST tensors."""
 
-    PEAK_TYPES = {"fragment": 0, "cls": 3}
+    PEAK_TYPES: ClassVar[dict[str, int]] = {"fragment": 0, "cls": 3}
 
     def __init__(
         self,

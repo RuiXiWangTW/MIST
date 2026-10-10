@@ -1,16 +1,16 @@
-from argparse import Namespace
 import json
 import os
-from pathlib import Path
 import subprocess
 import sys
+from argparse import Namespace
+from pathlib import Path
 
 import pytest
 import torch
 import yaml
+from test_training_sources import _config
 
 from mist.train_scaled import train
-from test_training_sources import _config
 
 
 def tiny_config(tmp_path, synthetic):
@@ -113,6 +113,7 @@ def test_two_rank_training_with_empty_validation_rank(tmp_path):
             "cpu",
         ],
         env=env,
+        check=False,
         text=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,

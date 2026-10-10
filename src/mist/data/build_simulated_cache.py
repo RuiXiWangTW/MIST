@@ -2,15 +2,15 @@
 
 from __future__ import annotations
 
-from collections import OrderedDict
 import argparse
 import json
 import multiprocessing as mp
 import os
-from pathlib import Path
 import shutil
 import tempfile
 import time
+from collections import OrderedDict
+from pathlib import Path
 from typing import Any
 
 import h5py
@@ -32,7 +32,6 @@ from mist.data.simulation_utils import (
 )
 from mist.utils.chem_utils import get_instr_idx
 
-
 _CONTEXT: dict[str, Any] = {}
 _TABLE_CACHE: OrderedDict[str, tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]] = (
     OrderedDict()
@@ -47,7 +46,7 @@ def _worker_init(context: dict[str, Any]) -> None:
 def _fingerprint_unique(index: int) -> tuple[int, np.ndarray, str | None]:
     try:
         return index, morgan4096_packed(_CONTEXT["unique_smiles"][index]), None
-    except Exception as error:
+    except Exception as error:  # noqa: BLE001 - report worker failures in the parent process
         return index, np.empty(0, dtype=np.uint8), f"{type(error).__name__}: {error}"
 
 
@@ -79,7 +78,7 @@ def _recover_row(index: int) -> tuple[int, float, int, str | None]:
             recovered.dropped_unrepresentable_peaks,
             None,
         )
-    except Exception as error:
+    except Exception as error:  # noqa: BLE001 - report worker failures in the parent process
         return index, float("nan"), 0, f"{type(error).__name__}: {error}"
 
 
