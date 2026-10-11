@@ -3,16 +3,23 @@ from io import BytesIO
 
 import pytest
 
-from mist.download import artifact_catalog, download_artifact
+from mist.download import download_artifact
 
 
-def test_all_pending_artifacts_fail_before_network(tmp_path, monkeypatch):
+@pytest.mark.parametrize("url,checksum", [
+    (None, None),
+    ("https://zenodo.org/records/example/files/model.ckpt", None),
+    (None, "a" * 64),
+])
+def test_pending_artifact_fails_before_network(tmp_path, monkeypatch, url, checksum):
     def forbidden(*args, **kwargs):
         raise AssertionError("placeholder must not make a network request")
     monkeypatch.setattr("mist.download.urlopen", forbidden)
-    for artifact in artifact_catalog()["artifacts"]:
-        with pytest.raises(ValueError, match="pending"):
-            download_artifact(artifact, tmp_path)
+    catalog = {"artifacts": {"pending": {
+        "filename": "model.ckpt", "url": url, "sha256": checksum,
+    }}}
+    with pytest.raises(ValueError, match="pending"):
+        download_artifact("pending", tmp_path, catalog)
 
 
 def test_download_checksum_and_reuse(tmp_path, monkeypatch):
