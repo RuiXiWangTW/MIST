@@ -35,14 +35,14 @@ data/msg_all/
 data/canopus_all/
   labels.tsv
   spec_files.hdf5
-  subformulae/no_subform.hdf5
   splits/source_splits/canopus_hplus_100_0.tsv
 ```
 
 The label table contains `spec`, `formula`, `ionization`, `instrument`, `smiles`,
 and `inchikey`. Split tables have exactly two columns, `name` and `split`, with
-`train`, `val`, `test`, or `exclude` assignments. Formula-assignment HDF5 keys
-identify spectrum/collision entries. Missing collision-energy labels do not
+`train`, `val`, `test`, or `exclude` assignments. MSG formula-assignment HDF5
+keys identify spectrum/collision entries. CANOPUS reads each source `.ms`
+entry directly from `spec_files.hdf5`. Missing collision-energy labels do not
 prevent feature construction. A precursor formula is required.
 
 ```bash
@@ -52,13 +52,15 @@ mist-build-real-cache --dataset-name canopus_all \
   --data-dir data --output data/compact/canopus
 ```
 
-By default the builder retains all assigned collision entries and the ten
-highest-intensity assigned fragments, plus a precursor/CLS token. The release
-recipes use fixed cache selections. In particular, CANOPUS validation uses
-one retained collision row per source spectrum (401 rows). A newly built cache
-containing every collision row is a different validation set; do not substitute
-it when reproducing a released model's validation selection. Use the published
-compact archive to retain the release selection exactly.
+CANOPUS uses one sample per source `.ms` file in train, validation, and test.
+All collision-energy spectra are merged by rounding m/z to four decimal
+places and taking the maximum intensity at each position. The merged spectrum
+is filtered above precursor m/z + 1, normalized to its maximum intensity, and
+square-root transformed, following the original MIST preprocessing. Up to 60
+peaks with transformed intensity greater than 0.001 enter formula assignment.
+The builder then retains the ten highest-intensity assigned fragments by
+default, plus a precursor/CLS token. Sample names are source spectrum IDs.
+MSG retains its separate assigned collision entries.
 
 ## Compact feature contract
 

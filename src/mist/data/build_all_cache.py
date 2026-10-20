@@ -106,6 +106,7 @@ def _build_split(
                 spectra_name=record.name,
                 spectra_formula=record.formula,
                 instrument=record.instrument,
+                ionization=record.ionization,
             )
             feature = featurizer.featurize(spectrum, train_mode=False)
             length = len(feature["peak_type"])
@@ -187,14 +188,16 @@ def build_all_cache(args: argparse.Namespace) -> list[dict]:
         "dataset_root": str(layout.root),
         "labels_sha256": sha256_file(layout.labels),
         "spectra_sha256": sha256_file(layout.spectra),
-        "assignments_sha256": sha256_file(layout.subformulae),
         "split": str(layout.split),
         "split_sha256": sha256_file(layout.split),
     }
+    if not layout.merge_collision_energies:
+        provenance["assignments_sha256"] = sha256_file(layout.subformulae)
     featurizer = PeakFormula(
         dataset_root=str(layout.root),
         max_peaks=args.max_peaks,
         subformula_ppm=args.subformula_ppm,
+        merge_collision_energies=layout.merge_collision_energies,
     )
     results = []
     requested = SPLIT_NAMES if args.splits is None else tuple(args.splits)

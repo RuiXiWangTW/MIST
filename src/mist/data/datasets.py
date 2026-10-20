@@ -2,9 +2,9 @@
 
 The training loader deliberately supports one on-disk contract. A dataset is
 selected by name below and contains ``labels.tsv``, ``spec_files.hdf5``, a
-fixed split table, and ``subformulae/no_subform.hdf5``. Spectrum/collision
-entries are materialized from the subformula-assignment keys; collision-energy
-metadata is intentionally neither parsed nor required by MIST.
+fixed split table, and (for MSG) ``subformulae/no_subform.hdf5``. CANOPUS uses
+one record per source spectrum, merging all collision energies during
+featurization. MSG records use the subformula-assignment keys.
 """
 
 from __future__ import annotations
@@ -72,15 +72,22 @@ class DatasetLayout:
     def split_name(self) -> str:
         return self.split.stem
 
+    @property
+    def merge_collision_energies(self) -> bool:
+        return self.name == "canopus_all"
+
     def validate(self) -> None:
-        required = (self.labels, self.spectra, self.subformulae, self.split)
+        hdf5_paths = (self.spectra,)
+        if not self.merge_collision_energies:
+            hdf5_paths += (self.subformulae,)
+        required = (self.labels, self.split, *hdf5_paths)
         missing = [str(path) for path in required if not path.is_file()]
         if missing:
             raise FileNotFoundError(
                 f"{self.name} does not satisfy the *_all dataset contract; "
                 f"missing files: {missing}"
             )
-        for path in (self.spectra, self.subformulae):
+        for path in hdf5_paths:
             try:
                 with h5py.File(path, "r"):
                     pass
@@ -90,7 +97,7 @@ class DatasetLayout:
 
 @dataclass(frozen=True)
 class SpectrumRecord:
-    """One subformula-assigned training example."""
+    """One source spectrum or collision-specific training example."""
 
     name: str
     source_spec: str
@@ -212,13 +219,17 @@ def load_dataset(
     *,
     max_records_per_split: int | None = None,
 ) -> LoadedDataset:
-    """Load and validate collision-specific records from a canonical dataset."""
+    """Load source-level CANOPUS or collision-specific MSG records."""
 
     if max_records_per_split is not None and max_records_per_split < 1:
         raise ValueError("max_records_per_split must be positive")
     labels, split_table = _read_tables(layout)
     label_rows = labels.set_index("spec", drop=False).to_dict(orient="index")
-    assignments = _index_assignments(layout, set(label_rows))
+    assignments = (
+        {}
+        if layout.merge_collision_energies
+        else _index_assignments(layout, set(label_rows))
+    )
 
     records: dict[str, list[SpectrumRecord]] = {name: [] for name in SPLIT_NAMES}
     missing_subformula = {name: 0 for name in SPLIT_NAMES}
@@ -234,8 +245,15 @@ def load_dataset(
             ):
                 continue
             row = label_rows[source_spec]
-            assignment_keys = assignments.get(source_spec, ())
-            if not assignment_keys:
+            names = (
+                (source_spec,)
+                if layout.merge_collision_energies
+                else tuple(
+                    key.removesuffix(".json")
+                    for key in assignments.get(source_spec, ())
+                )
+            )
+            if not names:
                 missing_subformula[split_name] += 1
                 continue
 
@@ -247,7 +265,7 @@ def load_dataset(
                     )
                 checked_spectra.add(spectrum_key)
 
-            for subformula_key in assignment_keys:
+            for name in names:
                 if (
                     max_records_per_split is not None
                     and len(records[split_name]) >= max_records_per_split
@@ -260,7 +278,7 @@ def load_dataset(
                         )
                 records[split_name].append(
                     SpectrumRecord(
-                        name=subformula_key.removesuffix(".json"),
+                        name=name,
                         source_spec=source_spec,
                         formula=row["formula"],
                         ionization=row["ionization"],
@@ -274,7 +292,7 @@ def load_dataset(
     for split_name in SPLIT_NAMES:
         if not frozen_records[split_name]:
             raise DatasetContractError(
-                f"{layout.name} produced no usable {split_name} collision entries"
+                f"{layout.name} produced no usable {split_name} entries"
             )
         logger.info(
             "%s %s: %d entries (%d labels without subformula assignments)",

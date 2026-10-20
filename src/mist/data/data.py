@@ -10,10 +10,12 @@ class Spectra:
         spectra_name: str,
         spectra_formula: str,
         instrument: str,
+        ionization: str = "",
     ) -> None:
         self.spectra_name = spectra_name
         self.formula = spectra_formula
         self.instrument = instrument
+        self.ionization = ionization
 
     def get_instrument(self) -> str:
         return self.instrument

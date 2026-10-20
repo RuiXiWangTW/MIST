@@ -15,8 +15,8 @@ from mist.data.data import Spectra
 from mist.utils import chem_utils
 
 
-class HDF5JsonStore:
-    """Process-local, read-only access to UTF-8 JSON entries in HDF5."""
+class HDF5TextStore:
+    """Process-local, read-only access to UTF-8 entries in HDF5."""
 
     def __init__(self, path: str | Path) -> None:
         self.path = Path(path).resolve()
@@ -54,6 +54,46 @@ class HDF5JsonStore:
         if not isinstance(value, str):
             raise TypeError(f"expected UTF-8 text at {self.path}:{key}")
         return value
+
+
+def merge_ms_spectrum(text: str) -> np.ndarray:
+    """Max-pool .ms peaks at four decimals, then normalize across energies.
+
+    Follows MIST's process_spec_file: keep the first m/z in each group,
+    filter above parentmass + 1, apply sqrt intensity normalization, and
+    retain up to 60 peaks with transformed intensity greater than 0.001.
+    """
+    parent_mass = 1_000_000.0
+    peaks: dict[float, list[float]] = {}
+    for line_number, line in enumerate(text.splitlines(), start=1):
+        line = line.strip()
+        if not line:
+            continue
+        if line.startswith((">", "#")):
+            fields = line[1:].split(maxsplit=1)
+            if len(fields) == 2 and fields[0].lower() in {"parentmass", "pepmass"}:
+                parent_mass = float(fields[1])
+            continue
+        fields = line.split()
+        if len(fields) < 2:
+            raise ValueError(f"invalid .ms peak at line {line_number}: {line!r}")
+        mz, intensity = map(float, fields[:2])
+        if not np.isfinite(mz) or not np.isfinite(intensity):
+            raise ValueError(f"non-finite .ms peak at line {line_number}")
+        key = float(np.round(mz, 4))
+        if key not in peaks:
+            peaks[key] = [mz, intensity]
+        else:
+            peaks[key][1] = max(peaks[key][1], intensity)
+
+    merged = np.asarray(list(peaks.values()), dtype=np.float64).reshape(-1, 2)
+    merged = merged[(merged[:, 0] <= parent_mass + 1) & (merged[:, 1] > 0)]
+    if len(merged) == 0:
+        return merged
+    merged[:, 1] = np.sqrt(merged[:, 1] / merged[:, 1].max())
+    order = np.argsort(merged[:, 1])[::-1][:60]
+    merged = merged[order]
+    return merged[merged[:, 1] > 0.001]
 
 
 @lru_cache(maxsize=512)
@@ -142,7 +182,7 @@ def assign_subformulae(tree: dict, mass_diff_thresh: float = 20.0) -> dict:
 
 
 class PeakFormula:
-    """Convert one canonical HDF5 subformula entry to MIST tensors."""
+    """Convert a merged source spectrum or subformula entry to MIST tensors."""
 
     PEAK_TYPES: ClassVar[dict[str, int]] = {"fragment": 0, "cls": 3}
 
@@ -152,18 +192,42 @@ class PeakFormula:
         dataset_root: str | Path,
         max_peaks: int = 10,
         subformula_ppm: float = 20.0,
+        merge_collision_energies: bool = False,
         **_: object,
     ) -> None:
         self.max_peaks = int(max_peaks)
         self.subformula_ppm = float(subformula_ppm)
-        path = Path(dataset_root).resolve() / "subformulae" / "no_subform.hdf5"
+        self.merge_collision_energies = merge_collision_energies
+        root = Path(dataset_root).resolve()
+        path = (
+            root / "spec_files.hdf5"
+            if merge_collision_energies
+            else root / "subformulae" / "no_subform.hdf5"
+        )
         if not path.is_file():
-            raise FileNotFoundError(f"canonical subformula HDF5 does not exist: {path}")
-        self.subformula_store = HDF5JsonStore(path)
+            raise FileNotFoundError(f"canonical spectrum HDF5 does not exist: {path}")
+        self.spectrum_store = HDF5TextStore(path)
 
     def _peak_dict(self, spectrum: Spectra) -> dict:
         name = spectrum.get_spec_name()
-        tree = json.loads(self.subformula_store.read(f"{name}.json"))
+        if self.merge_collision_energies:
+            merged = merge_ms_spectrum(self.spectrum_store.read(f"{name}.ms"))
+            tree = assign_subformulae(
+                {
+                    "cand_form": spectrum.get_spectra_formula(),
+                    "cand_ion": spectrum.ionization,
+                    "output_tbl": (
+                        {
+                            "mz": merged[:, 0].tolist(),
+                            "ms2_inten": merged[:, 1].tolist(),
+                        }
+                        if len(merged) else None
+                    ),
+                },
+                self.subformula_ppm,
+            )
+        else:
+            tree = json.loads(self.spectrum_store.read(f"{name}.json"))
         table = tree.get("output_tbl")
         if table is not None:
             count = len(table.get("mz", []))

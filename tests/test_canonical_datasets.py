@@ -6,7 +6,8 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from mist.data import datasets, featurizers
+from mist.data import build_all_cache, datasets, featurizers
+from mist.data.compact import CompactFeatureDataset
 from mist.data.data import Spectra
 from mist.utils import chem_utils
 
@@ -144,7 +145,13 @@ def test_canopus_loader_uses_hplus_100_0_split(tmp_path):
 
     assert layout.split.name == "canopus_hplus_100_0.tsv"
     assert layout.split.parent.name == "source_splits"
-    assert len(datasets.load_dataset(layout)["train"]) == 3
+    loaded = datasets.load_dataset(layout)
+    assert [record.name for record in loaded["train"]] == [
+        "train_a", "train_missing_ce", "train_assignment_without_ce",
+    ]
+    assert loaded.missing_subformula == {"train": 0, "val": 0, "test": 0}
+    limited = datasets.load_dataset(layout, max_records_per_split=1)
+    assert [record.name for record in limited["train"]] == ["train_a"]
 
 
 def test_split_schema_has_no_legacy_spec_column_fallback(tmp_path):
@@ -225,3 +232,86 @@ def test_subformula_assignment_recovers_representable_peaks():
 def test_only_named_canonical_datasets_are_supported(tmp_path):
     with pytest.raises(datasets.DatasetContractError, match="unsupported dataset"):
         datasets.DatasetLayout.resolve("legacy_dataset", tmp_path)
+
+
+def test_merge_ms_spectrum_pools_before_normalization():
+    text = """>parentmass 100
+#INSTRUMENT TYPE Orbitrap
+
+>collision 10
+20.123441 9
+30 1
+50 0
+60 -1
+
+>collision 20
+20.123442 4
+40 16
+20.123443 12
+102 1000
+70 0.000001
+"""
+    merged = featurizers.merge_ms_spectrum(text)
+    np.testing.assert_allclose(
+        merged,
+        [[40, 1], [20.123441, np.sqrt(12 / 16)], [30, 0.25]],
+    )
+
+
+@pytest.mark.parametrize("text", ["", ">collision nan\n", ">collision 10\n20 0\n"])
+def test_merge_ms_spectrum_handles_empty_peaks(text):
+    assert featurizers.merge_ms_spectrum(text).shape == (0, 2)
+
+
+@pytest.mark.parametrize("max_peaks", [2, 10])
+def test_canopus_cache_merges_all_energies_in_every_split(tmp_path, max_peaks):
+    data_dir = tmp_path / "data"
+    root = _write_dataset(data_dir, "canopus_all")
+    # CANOPUS uses raw .ms content, including spectra without assignment entries.
+    (root / "subformulae" / "no_subform.hdf5").unlink()
+    formulas = ["CH3O", "CH3", "C2H5O"]
+    masses = [
+        chem_utils.formula_mass(formula) + chem_utils.ion_to_mass["[M+H]+"]
+        for formula in formulas
+    ]
+    text = (
+        ">parentmass 47.049\n\n"
+        f">collision 10\n{masses[0]} 9\n{masses[1]} 1\n\n"
+        f">collision 20\n{masses[0]} 4\n{masses[2]} 16\n"
+    )
+    with h5py.File(root / "spec_files.hdf5", "r+") as handle:
+        for key in handle:
+            handle[key][0] = text
+
+    output = tmp_path / "compact"
+    args = build_all_cache.get_parser().parse_args([
+        "--dataset-name", "canopus_all", "--data-dir", str(data_dir),
+        "--output", str(output), "--max-peaks", str(max_peaks),
+    ])
+    manifests = build_all_cache.build_all_cache(args)
+    assert [manifest["rows"] for manifest in manifests] == [3, 1, 1]
+    expected_names = {
+        "train": ["train_a", "train_missing_ce", "train_assignment_without_ce"],
+        "val": ["val_a"],
+        "test": ["test_a"],
+    }
+    selected = [2, 0, 1][:max_peaks]
+    expected_forms = np.asarray([
+        *(chem_utils.formula_to_dense(formulas[i]) for i in selected),
+        chem_utils.formula_to_dense("C2H6O"),
+    ])
+    expected_intensities = [1.0, 0.75, 0.25][:max_peaks] + [1.0]
+    for split, names in expected_names.items():
+        cache = CompactFeatureDataset(output / split)
+        part = output / split / "part_00000"
+        assert np.load(part / "names.npy").tolist() == names
+        for index in range(len(cache)):
+            row = cache[index]
+            length = len(expected_intensities)
+            assert row["lengths"] == length
+            np.testing.assert_array_equal(row["form_vec"][:length], expected_forms)
+            np.testing.assert_allclose(row["intens"][:length], expected_intensities)
+            np.testing.assert_array_equal(
+                row["peak_type"][:length], [0] * len(selected) + [3],
+            )
+            assert row["fingerprints"].shape == (512,)
