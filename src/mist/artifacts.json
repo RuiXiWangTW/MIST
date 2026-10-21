@@ -4,86 +4,86 @@
     "msg-source": {
       "description": "MassSpecGym processed spectra, formula assignments, labels and splits",
       "filename": "msg_all.tar.gz",
-      "url": null,
-      "sha256": null,
-      "zenodo_doi": null
+      "url": "https://zenodo.org/records/23303289/files/msg_all.tar.gz",
+      "sha256": "f8665e6a3be019ddb6adaa5f87bc670634d4bb5965fdd3e583bd81918008463c",
+      "zenodo_doi": "10.5281/zenodo.23303289"
     },
     "msg-compact": {
       "description": "MassSpecGym portable training, validation and test feature caches",
       "filename": "msg_compact.tar.gz",
-      "url": null,
-      "sha256": null,
-      "zenodo_doi": null
+      "url": "https://zenodo.org/records/23303289/files/msg_compact.tar.gz",
+      "sha256": "a19e657a802cf5869d97b3486c7ce41021cba9c9a6279818e5d186307e3e7a35",
+      "zenodo_doi": "10.5281/zenodo.23303289"
     },
     "msg-synthetic": {
       "description": "MassSpecGym GLACIER synthetic training features (refined 4M molecules)",
       "filename": "msg_synthetic.tar.gz",
-      "url": null,
-      "sha256": null,
-      "zenodo_doi": null
+      "url": "https://zenodo.org/records/23303289/files/msg_synthetic.tar.gz",
+      "sha256": "24986a4964cd7f1eba93fc6f040de860dbd8e0dbae12fb795786874deb331acb",
+      "zenodo_doi": "10.5281/zenodo.23303289"
     },
     "msg-noaug": {
       "description": "MIST MassSpecGym real-only EMA checkpoint",
       "filename": "mist_msg_noaug.ckpt",
-      "url": null,
-      "sha256": null,
-      "zenodo_doi": null
+      "url": "https://zenodo.org/records/23303289/files/mist_msg_noaug.ckpt",
+      "sha256": "6f8df582df36aa4a984f120efee14ee0a62f3a7723caa770b856a6e704236727",
+      "zenodo_doi": "10.5281/zenodo.23303289"
     },
     "msg-aug": {
       "description": "MIST MassSpecGym synthetic-augmented EMA checkpoint",
       "filename": "mist_msg_aug.ckpt",
-      "url": null,
-      "sha256": null,
-      "zenodo_doi": null
+      "url": "https://zenodo.org/records/23303289/files/mist_msg_aug.ckpt",
+      "sha256": "9f251d772f68315ba6fe2dc75a3b2e1ec477d3f41ffbeaf5143749157b67b177",
+      "zenodo_doi": "10.5281/zenodo.23303289"
     },
     "msg-glacier": {
       "description": "GLACIER MassSpecGym checkpoint",
       "filename": "glacier_msg.ckpt",
-      "url": null,
-      "sha256": null,
-      "zenodo_doi": null
+      "url": "https://zenodo.org/records/23303289/files/glacier_msg.ckpt",
+      "sha256": "f43322c71802eafd1fe35886598df9b95649c9074a24d5fb5b84733159ea8fdb",
+      "zenodo_doi": "10.5281/zenodo.23303289"
     },
     "canopus-source": {
       "description": "CANOPUS processed spectra, formula assignments, labels and splits",
       "filename": "canopus_all.tar.gz",
-      "url": null,
-      "sha256": null,
-      "zenodo_doi": null
+      "url": "https://zenodo.org/records/23303289/files/canopus_all.tar.gz",
+      "sha256": "32bbe0206c80583feadea4f3b02db2115c74dc62fa030a8deba516b03d27d484",
+      "zenodo_doi": "10.5281/zenodo.23303289"
     },
     "canopus-compact": {
       "description": "CANOPUS portable training, validation and test feature caches",
       "filename": "canopus_compact.tar.gz",
-      "url": null,
-      "sha256": null,
-      "zenodo_doi": null
+      "url": "https://zenodo.org/records/23303289/files/canopus_compact.tar.gz",
+      "sha256": "a0f37bf096dccff22c706532c5ddbf841145f28a98173414fbf9f76b5d34dcb8",
+      "zenodo_doi": "10.5281/zenodo.23303289"
     },
     "canopus-synthetic": {
       "description": "CANOPUS GLACIER synthetic training features (random 2M molecules)",
       "filename": "canopus_synthetic.tar.gz",
-      "url": null,
-      "sha256": null,
-      "zenodo_doi": null
+      "url": "https://zenodo.org/records/23303289/files/canopus_synthetic.tar.gz",
+      "sha256": "6f9d795234cf7afd1c35f9542712617034c6338081fedc8c22a733106649980e",
+      "zenodo_doi": "10.5281/zenodo.23303289"
     },
     "canopus-noaug": {
       "description": "MIST CANOPUS real-only EMA checkpoint",
       "filename": "mist_canopus_noaug.ckpt",
-      "url": null,
-      "sha256": null,
-      "zenodo_doi": null
+      "url": "https://zenodo.org/records/23303289/files/mist_canopus_noaug.ckpt",
+      "sha256": "ff1f6897ca3b77eeed5ee17efc46ede61f80db0579bf028fffb85b86cb07752c",
+      "zenodo_doi": "10.5281/zenodo.23303289"
     },
     "canopus-aug": {
       "description": "MIST CANOPUS synthetic-augmented EMA checkpoint",
       "filename": "mist_canopus_aug.ckpt",
-      "url": null,
-      "sha256": null,
-      "zenodo_doi": null
+      "url": "https://zenodo.org/records/23303289/files/mist_canopus_aug.ckpt",
+      "sha256": "9fc6e6764938caff0033996ebc87b76b4e8e31d5a0368df42fa732c9f91f3195",
+      "zenodo_doi": "10.5281/zenodo.23303289"
     },
     "canopus-glacier": {
       "description": "GLACIER CANOPUS checkpoint",
       "filename": "glacier_canopus.ckpt",
-      "url": null,
-      "sha256": null,
-      "zenodo_doi": null
+      "url": "https://zenodo.org/records/23303289/files/glacier_canopus.ckpt",
+      "sha256": "0d6d9e13a40f29e12e13f7502ff6e8d9e02fb5039c82cb1663faa183532d623f",
+      "zenodo_doi": "10.5281/zenodo.23303289"
     }
   }
 }

@@ -2,8 +2,9 @@
 
 The prepared feature caches are the shortest path to training. Source spectra
 are also provided as compact HDF5 files for rebuilding features. Download
-locations are listed in `src/mist/artifacts.json`; all URLs, SHA-256 values, and
-Zenodo DOIs remain `null` until the corresponding artifact is uploaded.
+all released artifacts from [Zenodo](https://zenodo.org/records/23303289).
+The [download catalog](../src/mist/artifacts.json) records each file's HTTPS URL,
+SHA-256 checksum, and DOI (`10.5281/zenodo.23303289`).
 
 ## Archive layout
 
@@ -118,7 +119,7 @@ candidate molecules. For parallel conversion, give each process a distinct
 using the same command with `--finalize-only`. The single-process default
 finalizes automatically. This multiprocessing converter requires Linux.
 
-## Preparing a Zenodo upload
+## Exporting portable caches and checkpoints
 
 Local working caches may use indexed views or external part directories.
 Materialize them before packaging:
@@ -135,9 +136,3 @@ each split separately and archive `data/compact/canopus/` from `staging/`.
 For a MIST weight file, use `scripts/export_scaled_release.py` to retain the EMA,
 model configuration, dataset, step, and source hash while removing local paths,
 optimizer state, and other training metadata.
-
-After uploading, replace the matching `null` fields in
-`src/mist/artifacts.json` with the actual HTTPS URL, DOI, and lowercase SHA-256.
-Keep these fields unset for any artifact that is still unavailable. Include
-source data provenance, split definitions, and artifact-specific licenses in
-the Zenodo record.

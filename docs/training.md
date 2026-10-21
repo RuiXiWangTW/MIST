@@ -21,9 +21,10 @@ The release launcher exports the checkpoint with the best validation score,
 which can occur before the final step.
 
 Configuration files specify the seed, optimizer, warmup, EMA decay, precision,
-and validation cadence. They describe the training recipes; Zenodo records will
-identify the exact weight files and selected steps. Editing the world size or
-source batch sizes changes data exposure. For a customized run, record the
+and validation cadence. They describe the training recipes. The released EMA
+checkpoints are available on [Zenodo](https://zenodo.org/records/23303289);
+each checkpoint includes its model configuration, dataset, and selected step.
+Editing the world size or source batch sizes changes data exposure. For a customized run, record the
 modified configuration and recalibrate on its validation set.
 
 ## Distributed data loading

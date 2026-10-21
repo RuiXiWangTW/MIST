@@ -34,17 +34,18 @@ caches requires only the core MIST installation. See
 
 ## Data and pretrained models
 
-**Zenodo uploads are pending.** The download catalog contains explicit
-placeholders for URLs, DOIs, and checksums. Model weights and datasets are not
-included in Git. `mist-download` reports an unavailable artifact clearly until
-its upload has been filled in.
+Processed datasets, compact features, synthetic features, and pretrained MIST
+and GLACIER checkpoints are available on
+[Zenodo](https://zenodo.org/records/23303289)
+([DOI: 10.5281/zenodo.23303289](https://doi.org/10.5281/zenodo.23303289)).
+`mist-download` downloads the selected artifact and verifies its SHA-256 checksum.
 
 | Dataset | Processed source data | Compact features | Synthetic features | MIST checkpoints | Generator |
 |---|---|---|---|---|---|
 | MassSpecGym (MSG) | `msg-source` | `msg-compact` | `msg-synthetic` (refined 4M molecules) | `msg-noaug`, `msg-aug` | `msg-glacier` |
 | CANOPUS (NPLIB1) | `canopus-source` | `canopus-compact` | `canopus-synthetic` (random 2M molecules) | `canopus-noaug`, `canopus-aug` | `canopus-glacier` |
 
-After the uploads become available:
+Download compact features and a MIST checkpoint:
 
 ```bash
 mist-download --list
