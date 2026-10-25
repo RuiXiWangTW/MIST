@@ -29,7 +29,7 @@ from mist.metrics import (
     metric_summary,
     tanimoto_scores,
 )
-from mist.models.scaled_mist import ScaledMIST, count_parameters
+from mist.models.scaled_mist import ScaledMIST, count_parameters, load_mist_weights
 
 
 def _sha256(path: Path) -> str:
@@ -546,8 +546,8 @@ def train(args: argparse.Namespace) -> None:
         if checkpoint_provenance.get("initialization") is not None:
             initialization = checkpoint_provenance["initialization"]
             provenance["initialization"] = initialization
-        raw_model.load_state_dict(checkpoint["model"], strict=True)
-        ema_model.load_state_dict(checkpoint["ema_model"], strict=True)
+        load_mist_weights(raw_model, checkpoint["model"])
+        load_mist_weights(ema_model, checkpoint["ema_model"])
         optimizer.load_state_dict(checkpoint["optimizer"])
         scheduler.load_state_dict(checkpoint["scheduler"])
         start_step = int(checkpoint["step"])
@@ -570,8 +570,8 @@ def train(args: argparse.Namespace) -> None:
                 f"initialization checkpoint lacks state {initialize_state!r}"
             )
         parent_state = checkpoint[initialize_state]
-        raw_model.load_state_dict(parent_state, strict=True)
-        ema_model.load_state_dict(parent_state, strict=True)
+        load_mist_weights(raw_model, parent_state)
+        load_mist_weights(ema_model, parent_state)
         initialization = {
             "mode": "weights_only_optimizer_and_scheduler_reset",
             "checkpoint": str(initialize_path),

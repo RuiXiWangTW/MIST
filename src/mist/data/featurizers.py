@@ -120,6 +120,16 @@ def _heavy_formula_space(formula: str) -> tuple[np.ndarray, np.ndarray, np.ndarr
     return heavy[valid], heavy_masses[valid], max_h[valid]
 
 
+def _assigned_ion(value: object) -> bool:
+    if not isinstance(value, str) or not value:
+        return False
+    try:
+        chem_utils.standardize_adduct(value)
+    except ValueError:
+        return False
+    return True
+
+
 def assign_subformulae(tree: dict, mass_diff_thresh: float = 20.0) -> dict:
     """Assign precursor-consistent subformulae to unassigned peaks."""
 
@@ -127,14 +137,12 @@ def assign_subformulae(tree: dict, mass_diff_thresh: float = 20.0) -> dict:
     if output_table is None:
         return {
             "cand_form": tree["cand_form"],
-            "cand_ion": tree["cand_ion"],
+            "cand_ion": chem_utils.standardize_adduct(str(tree["cand_ion"])),
             "output_tbl": None,
         }
 
     formula = tree["cand_form"]
-    ion = tree["cand_ion"]
-    if ion not in chem_utils.ION_LST:
-        raise ValueError(f"unsupported canonical adduct {ion!r}")
+    ion = chem_utils.standardize_adduct(str(tree["cand_ion"]))
     heavy, heavy_masses, max_h = _heavy_formula_space(formula)
     hydrogen_index = chem_utils.element_to_ind["H"]
     hydrogen_mass = float(chem_utils.VALID_MONO_MASSES[hydrogen_index])
@@ -166,6 +174,10 @@ def assign_subformulae(tree: dict, mass_diff_thresh: float = 20.0) -> dict:
             continue
         form_vec = heavy[best].copy()
         form_vec[hydrogen_index] = hydrogen_counts[best]
+        # A peak sitting on the bare adduct mass has no atoms. vec_to_formula
+        # would emit "" and formula_to_dense rejects that string.
+        if not form_vec.any():
+            continue
         assigned["mz"].append(float(mass))
         assigned["ms2_inten"].append(float(intensity))
         assigned["mono_mass"].append(float(represented[best]))
@@ -237,7 +249,7 @@ class PeakFormula:
                 len(formulas) != count
                 or len(ions) != count
                 or any(not isinstance(value, str) or not value for value in formulas)
-                or any(value not in chem_utils.ION_LST for value in ions)
+                or any(not _assigned_ion(value) for value in ions)
             ):
                 tree = assign_subformulae(tree, self.subformula_ppm)
 

@@ -2,8 +2,8 @@
 set -euo pipefail
 recipe=${1:-}
 case "$recipe" in
-  msg-noaug|canopus-noaug|msg-aug|canopus-aug) ;;
-  *) echo "usage: $0 {msg-noaug|canopus-noaug|msg-aug|canopus-aug}" >&2; exit 2 ;;
+  msg-noaug|canopus-noaug|enveda-noaug|msg-aug|canopus-aug|enveda-aug) ;;
+  *) echo "usage: $0 {msg-noaug|canopus-noaug|enveda-noaug|msg-aug|canopus-aug|enveda-aug}" >&2; exit 2 ;;
 esac
 dataset=${recipe%-*}
 mode=${recipe##*-}

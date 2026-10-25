@@ -2,9 +2,11 @@
 
 The training loader deliberately supports one on-disk contract. A dataset is
 selected by name below and contains ``labels.tsv``, ``spec_files.hdf5``, a
-fixed split table, and (for MSG) ``subformulae/no_subform.hdf5``. CANOPUS uses
-one record per source spectrum, merging all collision energies during
-featurization. MSG records use the subformula-assignment keys.
+fixed split table, and, except for CANOPUS, ``subformulae/no_subform.hdf5``.
+CANOPUS uses one record per source spectrum, merging all collision energies
+during featurization. MSG and Enveda records use the subformula-assignment keys.
+Enveda's split table uses ``spec`` and ``Fold_0``; the loader reads those as
+``name`` and ``split``.
 """
 
 from __future__ import annotations
@@ -22,6 +24,7 @@ logger = logging.getLogger(__name__)
 SUPPORTED_DATASETS: Mapping[str, Path] = {
     "msg_all": Path("splits/split.tsv"),
     "canopus_all": Path("splits/source_splits/canopus_hplus_100_0.tsv"),
+    "enveda": Path("splits/split_1.tsv"),
 }
 REQUIRED_LABEL_COLUMNS = (
     "spec",
@@ -189,6 +192,8 @@ def _read_tables(layout: DatasetLayout) -> tuple[pd.DataFrame, pd.DataFrame]:
         dtype=str,
         keep_default_na=False,
     )
+    if list(split.columns) == ["spec", "Fold_0"]:
+        split = split.rename(columns={"spec": "name", "Fold_0": "split"})
     if list(split.columns) != ["name", "split"]:
         raise DatasetContractError(
             f"{layout.split} must have exactly ['name', 'split'] columns, "

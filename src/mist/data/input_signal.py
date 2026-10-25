@@ -16,8 +16,9 @@ import torch
 from torch.utils.data import DataLoader, Dataset
 
 from mist.data.compact import COMPACT_SCHEMA_VERSION
+from mist.data.datasets import SUPPORTED_DATASETS
 from mist.data.simulation_utils import sha256_file, write_json_atomic
-from mist.models.scaled_mist import ScaledMIST, count_parameters
+from mist.models.scaled_mist import ScaledMIST, count_parameters, load_mist_weights
 
 SPECTRUM_ARRAYS = (
     "form_vec.npy",
@@ -162,11 +163,9 @@ def predict_input_signal(
     if (split == "test") != bool(allow_test_input):
         raise PermissionError("test input requires --allow-test-input")
     dataset_name = str(dataset.manifest.get("dataset_name"))
-    if dataset.manifest.get("kind") != "real_spectrum" or dataset_name not in {
-        "canopus_all",
-        "msg_all",
-    }:
-        raise ValueError("prediction requires canonical MSG or CANOPUS real spectra")
+    if dataset.manifest.get("kind") != "real_spectrum" or dataset_name not in SUPPORTED_DATASETS:
+        choices = ", ".join(sorted(SUPPORTED_DATASETS))
+        raise ValueError(f"prediction requires canonical real spectra: {choices}")
     names = dataset.names()
     if len(set(names)) != len(names):
         raise ValueError("spectrum cache contains duplicate spectrum names")
@@ -189,7 +188,7 @@ def predict_input_signal(
     if checkpoint_dataset is not None and checkpoint_dataset != dataset_name:
         raise ValueError("prediction dataset differs from the checkpoint dataset")
     model = ScaledMIST(**checkpoint["config"]["model"])
-    model.load_state_dict(checkpoint["ema_model"], strict=True)
+    load_mist_weights(model, checkpoint["ema_model"])
     device = torch.device(device_name)
     model.to(device).eval()
     loader = DataLoader(

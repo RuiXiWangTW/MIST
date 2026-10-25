@@ -10,7 +10,8 @@ from pathlib import Path
 import torch
 
 from mist.data.simulation_utils import sha256_file
-from mist.models.scaled_mist import ScaledMIST, count_parameters
+from mist.data.datasets import SUPPORTED_DATASETS
+from mist.models.scaled_mist import ScaledMIST, count_parameters, load_mist_weights
 
 
 def export_checkpoint(source: Path, output: Path) -> None:
@@ -26,10 +27,11 @@ def export_checkpoint(source: Path, output: Path) -> None:
     original = checkpoint["config"]
     model_config = deepcopy(original["model"])
     model = ScaledMIST(**model_config)
-    model.load_state_dict(checkpoint["ema_model"], strict=True)
+    load_mist_weights(model, checkpoint["ema_model"])
     dataset = original["data"]["dataset_name"]
-    if dataset not in {"msg_all", "canopus_all"}:
-        raise ValueError("checkpoint dataset must be msg_all or canopus_all")
+    if dataset not in SUPPORTED_DATASETS:
+        choices = ", ".join(sorted(SUPPORTED_DATASETS))
+        raise ValueError(f"checkpoint dataset must be one of: {choices}")
     synthetic = original.get("experiment", {}).get("synthetic_training", any(s["source_type"] == "simulated" for s in original["data"].get("training_sources", [])))
     # Retain only configuration needed for inference and scientific interpretation.
     config = {

@@ -30,6 +30,7 @@ from mist.data.simulation_utils import (
     stable_json_hash,
     write_json_atomic,
 )
+from mist.data.datasets import SUPPORTED_DATASETS
 from mist.utils.chem_utils import get_instr_idx
 
 _CONTEXT: dict[str, Any] = {}
@@ -411,8 +412,11 @@ def finalize_cache(simulation: Path, output: Path) -> dict:
     simulation, output = simulation.resolve(), output.resolve()
     plan = load_plan_manifest(simulation)
     dataset_name = plan.get("dataset_name")
-    if dataset_name not in {"msg_all", "canopus_all"}:
-        raise SimulationPlanError("simulation plan requires dataset_name=msg_all or canopus_all")
+    if dataset_name not in SUPPORTED_DATASETS:
+        choices = ", ".join(sorted(SUPPORTED_DATASETS))
+        raise SimulationPlanError(
+            f"simulation plan requires dataset_name one of: {choices}"
+        )
     if plan.get("conditioning") != {"kind": "none"}:
         raise SimulationPlanError("simulation must be unconditioned")
     parts, signatures, widths = [], set(), set()

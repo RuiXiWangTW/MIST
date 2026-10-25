@@ -236,8 +236,9 @@ def load_training_data_contract(data_config: Mapping[str, Any]) -> TrainingDataC
 
     dataset_name = str(data_config.get("dataset_name", ""))
     if dataset_name not in SUPPORTED_DATASETS:
+        choices = ", ".join(sorted(SUPPORTED_DATASETS))
         raise TrainingSourceContractError(
-            "data.dataset_name must be msg_all or canopus_all"
+            f"data.dataset_name must be one of: {choices}"
         )
     raw_sources = data_config.get("training_sources")
     if not isinstance(raw_sources, Sequence) or isinstance(raw_sources, (str, bytes)):

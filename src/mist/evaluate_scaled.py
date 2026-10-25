@@ -17,7 +17,7 @@ import torch.distributed as dist
 
 from mist.data.compact import CompactFeatureDataset, make_compact_loader
 from mist.metrics import calibrate_threshold, metric_summary, tanimoto_scores
-from mist.models.scaled_mist import ScaledMIST, count_parameters
+from mist.models.scaled_mist import ScaledMIST, count_parameters, load_mist_weights
 from mist.train_scaled import _all_gather_rows, _distributed_context, _move_batch
 
 
@@ -144,7 +144,7 @@ def evaluate(args: argparse.Namespace) -> None:
     state_name = "model" if args.raw_model else "ema_model"
     if state_name not in checkpoint:
         raise ValueError(f"checkpoint does not contain requested state {state_name!r}")
-    model.load_state_dict(checkpoint[state_name], strict=True)
+    load_mist_weights(model, checkpoint[state_name])
     model.to(device).eval()
     loader, sampler = make_compact_loader(
         dataset,

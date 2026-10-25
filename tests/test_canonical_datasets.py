@@ -154,6 +154,28 @@ def test_canopus_loader_uses_hplus_100_0_split(tmp_path):
     assert [record.name for record in limited["train"]] == ["train_a"]
 
 
+def test_enveda_loader_reads_spec_and_fold_columns(tmp_path):
+    data_dir = tmp_path / "data"
+    source = _write_dataset(data_dir, "msg_all")
+    root = source.rename(data_dir / "enveda")
+    split = pd.read_csv(root / "splits" / "split.tsv", sep="\t").rename(
+        columns={"name": "spec", "split": "Fold_0"}
+    )
+    split.to_csv(root / "splits" / "split_1.tsv", sep="\t", index=False)
+    (root / "splits" / "split.tsv").unlink()
+
+    layout = datasets.DatasetLayout.resolve("enveda", data_dir)
+    loaded = datasets.load_dataset(layout)
+
+    assert layout.split.name == "split_1.tsv"
+    assert [record.name for record in loaded["train"]] == [
+        "train_a_collision 10",
+        "train_a_collision 20",
+        "train_assignment_without_ce_collision nan",
+    ]
+    assert loaded.missing_subformula == {"train": 1, "val": 0, "test": 0}
+
+
 def test_split_schema_has_no_legacy_spec_column_fallback(tmp_path):
     data_dir = tmp_path / "data"
     root = _write_dataset(data_dir, "msg_all")
@@ -227,6 +249,31 @@ def test_subformula_assignment_recovers_representable_peaks():
     np.testing.assert_allclose(actual["output_tbl"]["mz"], masses[:3])
     np.testing.assert_allclose(actual["output_tbl"]["ms2_inten"], intensities[:3])
     np.testing.assert_allclose(actual["output_tbl"]["abs_mass_diff"], 0.0, atol=1e-10)
+
+
+def test_subformula_assignment_skips_bare_adduct_peak():
+    formula = "C3H8O2"
+    ion = "[M+CHO2]-"
+    fragment = "C2H5O"
+    masses = [
+        chem_utils.formula_mass(fragment) + chem_utils.ion_to_mass[ion],
+        chem_utils.ion_to_mass[ion],
+    ]
+    tree = {
+        "cand_form": formula,
+        "cand_ion": ion,
+        "output_tbl": {
+            "mz": masses,
+            "ms2_inten": [1.0, 0.5],
+            "formula": ["", ""],
+            "ions": [chem_utils.ion_to_mass[ion], chem_utils.ion_to_mass[ion]],
+        },
+    }
+
+    actual = featurizers.assign_subformulae(tree, mass_diff_thresh=20.0)
+
+    assert actual["output_tbl"]["formula"] == [fragment]
+    assert actual["output_tbl"]["mz"] == [masses[0]]
 
 
 def test_only_named_canonical_datasets_are_supported(tmp_path):

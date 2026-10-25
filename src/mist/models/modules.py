@@ -6,7 +6,7 @@ import torch
 from torch import nn
 
 from mist.models import form_embedders, transformer_layer
-from mist.utils.chem_utils import ION_LST, max_instr_idx
+from mist.utils.chem_utils import LEGACY_ADDUCT_DIM, LEGACY_INSTR_DIM
 
 EPS = 1e-9
 
@@ -65,6 +65,8 @@ class FormulaTransformer(nn.Module):
         embed_instrument: bool = False,
         inten_transform: str = "float",
         no_diffs: bool = False,
+        adduct_dim: int = LEGACY_ADDUCT_DIM,
+        instr_dim: int = LEGACY_INSTR_DIM,
         **kwargs
     ):
         """_summary_
@@ -101,7 +103,7 @@ class FormulaTransformer(nn.Module):
         self.form_embedder_mod = form_embedders.get_embedder(self.form_embedder)
 
         self.embed_instrument = embed_instrument
-        self.instr_dim = max_instr_idx
+        self.instr_dim = int(instr_dim)
         self.instrument_embedder = nn.Parameter(torch.eye(self.instr_dim))
 
         self.inten_transform = inten_transform
@@ -115,7 +117,7 @@ class FormulaTransformer(nn.Module):
         self.num_types = 4
         self.cls_type = 3
 
-        self.adduct_dim = len(ION_LST) + 1
+        self.adduct_dim = int(adduct_dim)
 
         self.pairwise_featurization = pairwise_featurization
 
